@@ -57,7 +57,7 @@ export default {
             var formData = new FormData();
             formData.append("file", file);
 
-            let res = await this.$http.post('http://localhost:3000/admin/api/upload', formData)
+            let res = await this.$http.post('/upload', formData)
 
             let url = res.data.url; // Get url from response
             Editor.insertEmbed(cursorLocation, "image", url);

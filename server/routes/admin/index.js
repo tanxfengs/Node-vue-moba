@@ -11,6 +11,12 @@ module.exports = app=>{
     // const Category = require('../../models/Category')
 
 
+    //登录校验中间件
+    const authMiddleware = require('../../middleware/auth')
+
+    const resourceMiddleware = require('../../middleware/resource')
+
+
     router.post('/', async(req, res)=>{
 
         let model = await req.Model.create(req.body)
@@ -18,15 +24,7 @@ module.exports = app=>{
     })
     // 资源列表
 
-    router.get('/',async(req, res, next)=>{
-
-        const token = String(req.headers.authorization || '').split(' ').pop()
-        const { id } = jwt.verify(token, app.get('secret'))
-        let user = AdminUser.findById({id})
-        req.user = user
-        await next()
-
-    }, async(req, res)=>{  //关联查询 返回的字段是对象
+    router.get('/', async(req, res)=>{  //关联查询 返回的字段是对象
         let queryOptions = {}
         if(req.params.resource==='categories'){
             queryOptions.populate = 'parent'
@@ -61,19 +59,13 @@ module.exports = app=>{
 
 
 
-app.use('/admin/api/rest/:resource',async(req, res, next)=>{
-         // 类名转换
-         const ModelName = require('inflection').classify(req.params.resource)
-         req.Model = require(`../../models/${ModelName}`)
-         //继续下一个请求
-         next()
-    } ,router)
+app.use('/admin/api/rest/:resource', authMiddleware(), resourceMiddleware() ,router)
 
 
 const multer = require('multer')
 const upload = multer({dest: __dirname + '/../../upload'})
 
-app.post('/admin/api/upload', upload.single('file'),async(req, res)=>{//获取文件
+app.post('/admin/api/upload', authMiddleware(), upload.single('file'),async(req, res)=>{//获取文件
     const file = req.file
     file.url = `http://localhost:3000/upload/${file.filename}`
     res.send(file)
@@ -95,6 +87,7 @@ app.post('/admin/api/login', async(req, res)=>{
     // if(!isValid){
     //     res.status(422).send({'message': '密码错误'})
     // }
+    
     //3. 返回token
     const token = jwt.sign({id: user._id}, app.get('secret'))
     res.send({token})
@@ -102,7 +95,7 @@ app.post('/admin/api/login', async(req, res)=>{
 
 app.use(async(err, req, res, next)=>{
 
-    res.status(err.statusCode).send({
+    res.status(err.statusCode|| 500).send({
         message: err.message
     })
 })

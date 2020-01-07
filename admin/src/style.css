@@ -4,5 +4,5 @@ h1{
     font-size: 1.5rem;
 }
 .avatar-uploader .el-uploader:hover{border-color: #409eff;}
-.avatar-uploader-icon{font-size: 28px; counter-reset: #8c939d; min-width: 5rem; height: 5rem; line-height: 5rem;text-align: center}
-.avatar{min-width: 5rem; height: 5rem; display: block;}
+.avatar-uploader-icon{font-size: 28px; counter-reset: #8c939d; width: 5rem; height: 5rem; line-height: 5rem;text-align: center}
+.avatar{width: 5rem; height: 5rem; display: block;}

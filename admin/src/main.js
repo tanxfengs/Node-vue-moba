@@ -8,6 +8,19 @@ import './style.css'
 Vue.config.productionTip = false
 Vue.prototype.$http = http
 
+// 设置全局方法
+Vue.mixin({
+  computed:{
+    uploadUrl(){
+      return this.$http.defaults.baseURL + '/upload'
+    }
+  },
+  methods:{
+    getAuthHeaders(){
+      return {Authorization :`Bearer ${localStorage.token||''}`}
+    }
+  }
+})
 
 new Vue({
   router,
